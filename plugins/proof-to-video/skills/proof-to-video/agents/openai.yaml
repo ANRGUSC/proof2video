@@ -1,0 +1,4 @@
+interface:
+  display_name: "Proof to Video"
+  short_description: "Expand proofs into narrated mathematical videos"
+  default_prompt: "Use $proof-to-video to explain this result and produce a synchronized video."

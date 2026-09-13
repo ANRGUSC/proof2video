@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "Please cite this software if it contributes to your mathematical explanation workflow."
+title: "Proof to Video"
+type: software
+version: 0.1.0
+authors:
+  - family-names: Krishnamachari
+    given-names: Bhaskar
+license: BSD-3-Clause
+abstract: "A Codex plugin and reproducible workflow for expanded proof explanations, Manim animation, local speech, synchronized captions, and reviewed mathematical videos."
+repository-code: "https://github.com/ANRGUSC/proof2video"

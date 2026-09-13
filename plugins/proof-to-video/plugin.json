@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "proof-to-video",
+  "version": "0.1.0",
+  "description": "Expand mathematical proofs into synchronized narrated videos."
+}

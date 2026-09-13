@@ -1,0 +1,15 @@
+name: proof-to-video
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - manim=0.20.1
+  - numpy
+  - pillow
+  - ffmpeg
+  - pysoundfile
+  - pip
+  - pip:
+      - kokoro-onnx==0.6.1
+# Install LaTeX separately: pdflatex plus dvisvgm or pdftocairo.
+# Download Kokoro weights/voices separately; see the README.

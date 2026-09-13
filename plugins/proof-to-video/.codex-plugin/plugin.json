@@ -1,0 +1,30 @@
+{
+  "name": "proof-to-video",
+  "version": "0.1.0",
+  "description": "Turn a theorem or lemma into a carefully expanded, narrated mathematical video.",
+  "author": {
+    "name": "Bhaskar Krishnamachari"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Proof to Video",
+    "shortDescription": "Expand a proof and create a synchronized mathematical video.",
+    "longDescription": "Build a bottom-up explanation for advanced undergraduates and beginning graduate students, then create Manim visuals, local synthetic narration, captions, chapters, and reviewed video exports.",
+    "developerName": "Bhaskar Krishnamachari",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "Turn this lemma and its proof into a narrated video.",
+      "Revise the visuals while keeping the narration and timing."
+    ]
+  },
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "mathematics",
+    "education",
+    "manim",
+    "proofs",
+    "video",
+    "tts"
+  ]
+}

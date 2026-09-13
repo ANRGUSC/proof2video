@@ -1,0 +1,135 @@
+{
+  "video_sha256": "96617656398c0aa80e663e079d0805cb9ed6311b04d2b786bb05c5dcefa3f528",
+  "duration": 110.1,
+  "frame_count": 3303,
+  "decode": "passed",
+  "max_sentence_onset_error": 0.016666666666669272,
+  "chapter_count": 3,
+  "automated_media_checks": "passed",
+  "visual_review": "passed",
+  "audio_listening_review": "pending",
+  "proof_review": "Model-assisted; not machine checked",
+  "snapshots": [
+    {
+      "cue": "question",
+      "time": 2.0,
+      "file": "qa/question_0.png"
+    },
+    {
+      "cue": "question",
+      "time": 7.166666666666667,
+      "file": "qa/question_1.png"
+    },
+    {
+      "cue": "question",
+      "time": 14.133333333333335,
+      "file": "qa/question_2.png"
+    },
+    {
+      "cue": "definitions",
+      "time": 16.333333333333336,
+      "file": "qa/definitions_0.png"
+    },
+    {
+      "cue": "definitions",
+      "time": 21.233333333333334,
+      "file": "qa/definitions_1.png"
+    },
+    {
+      "cue": "definitions",
+      "time": 27.933333333333334,
+      "file": "qa/definitions_2.png"
+    },
+    {
+      "cue": "balance",
+      "time": 30.133333333333333,
+      "file": "qa/balance_0.png"
+    },
+    {
+      "cue": "balance",
+      "time": 34.483333333333334,
+      "file": "qa/balance_1.png"
+    },
+    {
+      "cue": "balance",
+      "time": 40.63333333333333,
+      "file": "qa/balance_2.png"
+    },
+    {
+      "cue": "split",
+      "time": 42.833333333333336,
+      "file": "qa/split_0.png"
+    },
+    {
+      "cue": "split",
+      "time": 47.5,
+      "file": "qa/split_1.png"
+    },
+    {
+      "cue": "split",
+      "time": 53.96666666666666,
+      "file": "qa/split_2.png"
+    },
+    {
+      "cue": "cancel",
+      "time": 56.166666666666664,
+      "file": "qa/cancel_0.png"
+    },
+    {
+      "cue": "cancel",
+      "time": 60.36666666666666,
+      "file": "qa/cancel_1.png"
+    },
+    {
+      "cue": "cancel",
+      "time": 66.36666666666666,
+      "file": "qa/cancel_2.png"
+    },
+    {
+      "cue": "identity",
+      "time": 68.56666666666666,
+      "file": "qa/identity_0.png"
+    },
+    {
+      "cue": "identity",
+      "time": 73.03333333333333,
+      "file": "qa/identity_1.png"
+    },
+    {
+      "cue": "identity",
+      "time": 79.3,
+      "file": "qa/identity_2.png"
+    },
+    {
+      "cue": "minimize",
+      "time": 81.5,
+      "file": "qa/minimize_0.png"
+    },
+    {
+      "cue": "minimize",
+      "time": 86.75,
+      "file": "qa/minimize_1.png"
+    },
+    {
+      "cue": "minimize",
+      "time": 93.8,
+      "file": "qa/minimize_2.png"
+    },
+    {
+      "cue": "curve",
+      "time": 96.0,
+      "file": "qa/curve_0.png"
+    },
+    {
+      "cue": "curve",
+      "time": 102.05,
+      "file": "qa/curve_1.png"
+    },
+    {
+      "cue": "curve",
+      "time": 109.89999999999999,
+      "file": "qa/curve_2.png"
+    }
+  ],
+  "visual_review_notes": "Inspected all 24 final encoded-video snapshots across eight cues, checking equation identities, fraction bars, subscripts, captions, number-line movement endpoints, and the labeled quadratic minimum. Also inspected the independent 1080p notation regression scene. Listening review remains pending."
+}

@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "title": "Why the mean minimizes squared error",
+  "result": "Least-squares constant theorem",
+  "source": {
+    "title": "Original worked example: least-squares constant theorem",
+    "locator": "proof.md, Statement and P1\u2013P5",
+    "status": "Educational worked example",
+    "authors": []
+  },
+  "proof_file": "proof.md",
+  "proof_review": {
+    "status": "ready",
+    "open_issues": [],
+    "proof_sha256": ""
+  },
+  "voice": {
+    "name": "af_heart",
+    "speed": 0.9,
+    "language": "en-us"
+  },
+  "chapters": [
+    {
+      "id": "setup",
+      "title": "The question and definitions"
+    },
+    {
+      "id": "proof",
+      "title": "Expand and cancel"
+    },
+    {
+      "id": "conclusion",
+      "title": "Optimality and uniqueness"
+    }
+  ],
+  "cues": [
+    {
+      "id": "question",
+      "chapter": "setup",
+      "title": "Which constant best represents these numbers?",
+      "equations": [],
+      "sentences": [
+        {
+          "say": "Suppose we want to replace several real numbers by one constant, while minimizing their average squared error."
+        },
+        {
+          "say": "We will prove that the unique best constant is their arithmetic mean."
+        }
+      ],
+      "proof_step": "statement",
+      "hold": 3,
+      "visual": "number_line",
+      "data": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "start": 1,
+        "event_sentence": 1
+      },
+      "note": "A worked example: 1, 3, 5. Their arithmetic mean is 3."
+    },
+    {
+      "id": "definitions",
+      "chapter": "setup",
+      "title": "Define the average and the objective",
+      "equations": [
+        "\\bar x=\\frac1n\\sum_{i=1}^n x_i",
+        "F(a)=\\frac1n\\sum_{i=1}^n(x_i-a)^2"
+      ],
+      "sentences": [
+        {
+          "say": "There are n real numbers, with n at least one. Their arithmetic mean is x bar."
+        },
+        {
+          "say": "For any proposed constant a, F of a is the average squared distance from those numbers."
+        }
+      ],
+      "proof_step": "definitions",
+      "hold": 3
+    },
+    {
+      "id": "balance",
+      "chapter": "proof",
+      "title": "Deviations from the mean add to zero",
+      "equations": [
+        "\\sum_i(x_i-\\bar x)=\\sum_i x_i-n\\bar x=0"
+      ],
+      "sentences": [
+        {
+          "say": "The crucial observation is that the signed deviations from the mean add to zero."
+        },
+        {
+          "say": "This follows directly from the definition of the arithmetic mean."
+        }
+      ],
+      "proof_step": "P1",
+      "hold": 3
+    },
+    {
+      "id": "split",
+      "chapter": "proof",
+      "title": "Separate the data deviation and the constant shift",
+      "equations": [
+        "x_i-a=(x_i-\\bar x)+(\\bar x-a)",
+        "(x_i-a)^2=(x_i-\\bar x)^2+2(x_i-\\bar x)(\\bar x-a)+(\\bar x-a)^2"
+      ],
+      "sentences": [
+        {
+          "say": "Write each error as the deviation from the mean plus the shift from a to the mean."
+        },
+        {
+          "say": "Squaring gives three terms: a squared deviation, a cross term, and a squared shift."
+        }
+      ],
+      "proof_step": "P2",
+      "hold": 3
+    },
+    {
+      "id": "cancel",
+      "chapter": "proof",
+      "title": "The cross term cancels after summing",
+      "equations": [
+        "\\frac2n\\sum_i(x_i-\\bar x)(\\bar x-a)",
+        "=\\frac2n(\\bar x-a)\\sum_i(x_i-\\bar x)=0"
+      ],
+      "sentences": [
+        {
+          "say": "The shift is the same for every data point, so it can come outside the sum."
+        },
+        {
+          "say": "What remains is the sum of deviations, which we already showed is zero."
+        }
+      ],
+      "proof_step": "P3",
+      "hold": 3
+    },
+    {
+      "id": "identity",
+      "chapter": "proof",
+      "title": "An exact identity, valid for every constant",
+      "equations": [
+        "F(a)=F(\\bar x)+(a-\\bar x)^2"
+      ],
+      "sentences": [
+        {
+          "say": "The average of n identical squared shifts is just one squared shift."
+        },
+        {
+          "say": "We obtain this exact identity, with no approximation and no omitted terms."
+        }
+      ],
+      "proof_step": "P4",
+      "hold": 3,
+      "note": "Every real value of a is covered by the calculation."
+    },
+    {
+      "id": "minimize",
+      "chapter": "conclusion",
+      "title": "A square is nonnegative, and vanishes only at zero",
+      "equations": [
+        "F(a)-F(\\bar x)=(a-\\bar x)^2\\ge0",
+        "F(a)=F(\\bar x)\\quad\\Longleftrightarrow\\quad a=\\bar x"
+      ],
+      "sentences": [
+        {
+          "say": "The extra square is nonnegative, so no constant can beat the mean."
+        },
+        {
+          "say": "Equality holds only when a equals the mean. That proves both global optimality and uniqueness."
+        }
+      ],
+      "proof_step": "P5",
+      "hold": 3
+    },
+    {
+      "id": "curve",
+      "chapter": "conclusion",
+      "title": "See the minimum in a concrete example",
+      "equations": [],
+      "sentences": [
+        {
+          "say": "For the values one, three, and five, the mean is three and the minimum average loss is eight thirds."
+        },
+        {
+          "say": "The curve rises by exactly the square of the distance from three. The numerical picture illustrates the proof."
+        }
+      ],
+      "proof_step": "example",
+      "hold": 3,
+      "visual": "curve",
+      "data": {
+        "coefficients": [
+          1,
+          -6,
+          11.666666666666666
+        ],
+        "x_range": [
+          0,
+          6,
+          1
+        ],
+        "y_range": [
+          0,
+          12,
+          2
+        ],
+        "start": 1,
+        "target": 3,
+        "event_sentence": 1,
+        "x_label": "a",
+        "y_label": "F(a)"
+      },
+      "note": "Illustration for (1,3,5); the preceding algebra proves the general case."
+    }
+  ]
+}
