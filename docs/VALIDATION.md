@@ -1,5 +1,9 @@
 # Validation of version 0.1.0
 
+For the subsequent Windows audit and release-hardening changes, see
+[RELEASE_AUDIT.md](RELEASE_AUDIT.md). The results below describe the original
+Linux validation and are retained as historical evidence.
+
 The initial implementation was exercised on Linux on 12 September 2026 using
 Manim Community 0.20.1, local kokoro-onnx 0.6.1, FFmpeg, pdfLaTeX, and Poppler.
 The TTS and renderer used separate Python environments. The supplied environment

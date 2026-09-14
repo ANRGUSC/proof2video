@@ -24,7 +24,9 @@ GOLD = "#FFD078"
 CORAL = "#FFAC96"
 GREEN = "#8AE3B3"
 LAVENDER = "#C5B6FF"
-FONT = "DejaVu Sans"
+import manimpango
+FONT = next((name for name in ['DejaVu Sans', 'Arial', 'Liberation Sans']
+             if name in manimpango.list_fonts()), 'Sans')
 
 config.background_color = BG
 config.frame_width = 14.2222222222

@@ -1,0 +1,9 @@
+{
+  "name": "proof-to-video",
+  "version": "0.1.0",
+  "description": "Turn a theorem or lemma into a carefully expanded, narrated mathematical video.",
+  "author": {
+    "name": "Bhaskar Krishnamachari"
+  },
+  "license": "BSD-3-Clause"
+}

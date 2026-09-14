@@ -6,7 +6,7 @@ description: Turn a theorem or lemma and its supporting proof material into a bo
 # Proof to Video
 
 Create an explanation a senior undergraduate or first-year graduate student can
-follow, then produce a synchronized video. Codex writes and reviews the
+follow, then produce a synchronized video. The agent writes and reviews the
 mathematics and chooses the visuals; bundled Python handles deterministic media
 production. The scripts do not automatically understand or verify arbitrary PDFs.
 

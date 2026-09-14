@@ -5,7 +5,25 @@ from .core import *
 
 def run(args,**kwargs):return subprocess.run([str(a) for a in args],check=True,**kwargs)
 def probe(path):return json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_chapters','-show_format','-of','json',str(path)]))
+def require(condition,message):
+ if not condition:raise ValueError(message)
 def ffescape(s):return str(s).replace('\\','\\\\').replace('\n',' ').replace('=','\\=').replace(';','\\;').replace('#','\\#')
+
+def render_inputs(root,p):
+ names={p['proof_file'],'timeline.json','audio/narration.wav'}
+ for name in ['visuals.py','simulation.py','exports/subtitles.srt','exports/subtitles.vtt','exports/transcript.txt','exports/chapters.txt']:
+  if (root/name).exists():names.add(name)
+ for directory in ['assets','simulation_results']:
+  names.update(f.relative_to(root).as_posix() for f in (root/directory).rglob('*') if f.is_file())
+ return {name:digest(inside(root,name)) for name in sorted(names)}
+
+def current_render(root,p,preview=False):
+ video=root/'exports'/('preview.mp4' if preview else 'video.mp4')
+ manifest=read(root/'build'/('preview_manifest.json' if preview else 'render_manifest.json'))
+ if (manifest.get('project_sha256')!=fingerprint(p) or manifest.get('video_sha256')!=digest(video)
+     or manifest.get('inputs')!=render_inputs(root,p)):
+  raise ValueError('Stale render: regenerate the video')
+ return video,manifest
 
 def render(root,preview=False):
  root=Path(root).resolve();p,t=current_timeline(root)
@@ -30,7 +48,8 @@ def render(root,preview=False):
   run(['ffmpeg','-v','error','-y','-i',root/'audio/narration.wav','-c:a','aac','-b:a','160k','-ar','48000','-ac','2',audio]);write(audio_meta,dict(wav_sha256=t['audio_sha256'],encoded_sha256=digest(audio)))
  target=root/'exports'/('preview.mp4' if preview else 'video.mp4');tmp=media/'export.mp4'
  run(['ffmpeg','-v','error','-y','-i',raw,'-i',audio,'-i',meta,'-map','0:v:0','-map','1:a:0','-map_metadata','2','-map_chapters','2','-c:v','copy','-c:a','copy','-movflags','+faststart',tmp]);shutil.copy2(tmp,target)
- write(root/'build/render_manifest.json',dict(plugin_version=VERSION,project_sha256=fingerprint(p),video_sha256=digest(target),video_file=target.name,proof_sha256=digest(inside(root,p['proof_file'])),preview=preview))
+ shutil.copy2(root/'qa/timing.json',root/'build'/('preview_timing.json' if preview else 'render_timing.json'))
+ write(root/'build'/('preview_manifest.json' if preview else 'render_manifest.json'),dict(plugin_version=VERSION,project_sha256=fingerprint(p),video_sha256=digest(target),video_file=target.name,proof_sha256=digest(inside(root,p['proof_file'])),inputs=render_inputs(root,p),preview=preview))
  print(str(target),flush=True);return target
 
 def faststart(path):
@@ -48,37 +67,38 @@ def faststart(path):
 
 def verify(root,preview=False):
  from PIL import Image,ImageDraw
- root=Path(root).resolve();p,t=current_timeline(root);video=root/'exports'/('preview.mp4' if preview else 'video.mp4');info=probe(video);manifest=read(root/'build/render_manifest.json')
- if manifest['project_sha256']!=fingerprint(p) or manifest['video_sha256']!=digest(video):raise ValueError('Stale render: regenerate the video')
+ root=Path(root).resolve();p,t=current_timeline(root);video,manifest=current_render(root,p,preview);info=probe(video)
  v=next(s for s in info['streams'] if s['codec_type']=='video');a=next(s for s in info['streams'] if s['codec_type']=='audio');size=(1280,720) if preview else (1920,1080)
- assert (v['width'],v['height'])==size and v['pix_fmt']=='yuv420p' and v['codec_name']=='h264' and v['avg_frame_rate']=='30/1'
- assert int(v['nb_frames'])==round(t['duration']*FPS)
- assert abs(float(a['duration'])-t['duration'])<.08 and a['codec_name']=='aac'
- assert faststart(video)
- assert len(info['chapters'])==len(t['chapters'])
+ require((v['width'],v['height'])==size and v['pix_fmt']=='yuv420p' and v['codec_name']=='h264' and v['avg_frame_rate']=='30/1','Unexpected video format')
+ require(int(v['nb_frames'])==round(t['duration']*FPS),'Unexpected frame count')
+ require(abs(float(a['duration'])-t['duration'])<.08 and a['codec_name']=='aac','Unexpected audio duration or codec')
+ require(faststart(video),'MP4 is missing fast-start layout')
+ require(len(info['chapters'])==len(t['chapters']),'Unexpected chapter count')
  for actual,ch in zip(info['chapters'],t['chapters']):
-  assert abs(float(actual['start_time'])-ch['start'])<.002 and abs(float(actual['end_time'])-ch['end'])<.002
- audit=read(root/'qa/timing.json');assert len(audit)==sum(len(c['sentences']) for c in t['cues'])
- error=max(abs(a['planned']-a['rendered']) for a in audit);assert error<=1/60+1e-6
+  require(abs(float(actual['start_time'])-ch['start'])<.002 and abs(float(actual['end_time'])-ch['end'])<.002,'Unexpected chapter timing')
+ audit=read(root/'build'/('preview_timing.json' if preview else 'render_timing.json'));require(len(audit)==sum(len(c['sentences']) for c in t['cues']),'Incomplete sentence timing audit')
+ error=max(abs(a['planned']-a['rendered']) for a in audit);require(error<=1/60+1e-6,'Sentence onset exceeds half a frame')
  run(['ffmpeg','-v','error','-xerror','-i',video,'-f','null','-'],stdout=subprocess.DEVNULL)
- records=[]
+ records=[];qa=root/'qa'/('preview' if preview else 'final');qa.mkdir(parents=True,exist_ok=True)
  for c in t['cues']:
   # Last settled state plus early/middle samples catch reveal and transition errors.
   times=sorted(set([min(c['end']-.2,c['start']+2),(c['start']+c['end'])/2,c['end']-.2]))
   for i,sec in enumerate(times):
-   target=root/'qa'/f"{c['id']}_{i}.png";run(['ffmpeg','-v','error','-y','-ss',str(sec),'-i',video,'-frames:v','1',target]);records.append(dict(cue=c['id'],time=sec,file=str(target.relative_to(root))))
+   target=qa/f"{c['id']}_{i}.png";run(['ffmpeg','-v','error','-y','-ss',str(sec),'-i',video,'-frames:v','1',target]);records.append(dict(cue=c['id'],time=sec,file=str(target.relative_to(root))))
  for start in range(0,len(records),6):
   subset=records[start:start+6];sheet=Image.new('RGB',(1600,480*((len(subset)+1)//2)),'#101824');draw=ImageDraw.Draw(sheet)
   for i,row in enumerate(subset):
    im=Image.open(root/row['file']).resize((800,450));x=i%2*800;y=i//2*480;sheet.paste(im,(x,y+30));draw.text((x+10,y+5),f"{row['cue']} at {row['time']:.2f}s",fill='white')
-  sheet.save(root/'qa'/f'review_{start//6+1:02}.jpg')
+  sheet.save(qa/f'review_{start//6+1:02}.jpg')
  report=dict(video_sha256=digest(video),duration=t['duration'],frame_count=int(v['nb_frames']),decode='passed',max_sentence_onset_error=error,chapter_count=len(t['chapters']),automated_media_checks='passed',visual_review='pending',audio_listening_review='pending',proof_review='Model-assisted; not machine checked',snapshots=records)
- write(root/'exports/verification.json',report);print('Media checks passed. Inspect qa/review_*.jpg, full-resolution frames, and listen to narration; visual/audio review is still pending.',flush=True)
+ write(root/'exports'/('preview_verification.json' if preview else 'verification.json'),report);print(f'Media checks passed. Inspect {qa}/review_*.jpg, full-resolution frames, and listen to narration; visual/audio review is still pending.',flush=True)
  return report
 
 def mark_review(root,notes,component='both'):
  root=Path(root);p,t=current_timeline(root);r=read(root/'exports/verification.json');v=root/'exports/video.mp4'
  if not v.exists() or digest(v)!=r['video_sha256']:raise ValueError('Review must refer to the current full-quality video')
+ current_render(root,p)
+ if r.get('automated_media_checks')!='passed':raise ValueError('Run verify before recording review')
  if len(notes.strip())<30:raise ValueError('Record what was inspected and any remaining issues')
  if component not in {'both','visual','audio'}:raise ValueError('Unknown review component')
  if component in {'both','visual'}:r.update(visual_review='passed',visual_review_notes=notes)
@@ -86,8 +106,10 @@ def mark_review(root,notes,component='both'):
  write(root/'exports/verification.json',r)
 
 def package(root):
- root=Path(root).resolve();current_timeline(root);r=read(root/'exports/verification.json');v=root/'exports/video.mp4'
+ root=Path(root).resolve();p,t=current_timeline(root);r=read(root/'exports/verification.json');v=root/'exports/video.mp4'
  if digest(v)!=r['video_sha256'] or r['visual_review']!='passed' or r['audio_listening_review']!='passed':raise ValueError('Complete final visual and audio review before packaging')
+ current_render(root,p)
+ if r.get('automated_media_checks')!='passed':raise ValueError('Run verify before packaging')
  out=root/'exports'
  with zipfile.ZipFile(out/'video.zip','w',zipfile.ZIP_STORED) as z:z.write(v,'video.mp4')
  p=read(root/'project.json');names=['provenance.json','build/render_manifest.json','project.json',p['proof_file'],'timeline.json','visuals.py','simulation.py','audio/model_provenance.json','audio/narration.wav','audio/narration.m4a','audio/encoded.json']

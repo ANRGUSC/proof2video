@@ -43,10 +43,35 @@ class ProjectTests(unittest.TestCase):
   from proof_video.media import mark_review,package
   p=read(self.root/'project.json');write(self.root/'timeline.json',{'project_sha256':fingerprint(p)})
   v=self.root/'exports/video.mp4';v.parent.mkdir();v.write_bytes(b'review-fixture')
-  write(self.root/'exports/verification.json',{'video_sha256':digest(v),'visual_review':'pending','audio_listening_review':'pending'})
+  from proof_video.media import render_inputs
+  (self.root/'audio').mkdir();(self.root/'audio/narration.wav').write_bytes(b'audio-fixture')
+  write(self.root/'build/render_manifest.json',{'project_sha256':fingerprint(p),'video_sha256':digest(v),'inputs':render_inputs(self.root,p)})
+  write(self.root/'exports/verification.json',{'video_sha256':digest(v),'automated_media_checks':'passed','visual_review':'pending','audio_listening_review':'pending'})
   mark_review(self.root,'Inspected the exported frames for legibility and notation.',component='visual')
   r=read(self.root/'exports/verification.json');self.assertEqual(r['visual_review'],'passed');self.assertEqual(r['audio_listening_review'],'pending')
   with self.assertRaisesRegex(ValueError,'visual and audio review'):package(self.root)
+  mark_review(self.root,'Fixture attestation for testing the packaging mechanism only.',component='audio')
+  package(self.root)
+  import zipfile
+  with zipfile.ZipFile(self.root/'exports/video.zip') as z:
+   self.assertIsNone(z.testzip());self.assertEqual(z.read('video.mp4'),b'review-fixture')
+  with zipfile.ZipFile(self.root/'exports/project_source.zip') as z:
+   self.assertIsNone(z.testzip());self.assertIn('proof.md',z.namelist());self.assertIn('exports/verification.json',z.namelist())
+ def test_changed_render_inputs_block_review_and_package(self):
+  from proof_video.media import render_inputs,mark_review,package
+  p=read(self.root/'project.json');write(self.root/'timeline.json',{'project_sha256':fingerprint(p)})
+  v=self.root/'exports/video.mp4';v.parent.mkdir();v.write_bytes(b'video-fixture')
+  (self.root/'audio').mkdir();(self.root/'audio/narration.wav').write_bytes(b'audio-fixture')
+  for name in ['proof.md','visuals.py','assets/plot.svg','audio/narration.wav','exports/subtitles.srt']:
+   f=self.root/name;f.parent.mkdir(exist_ok=True);f.write_text('original')
+  for name in ['proof.md','visuals.py','assets/plot.svg','audio/narration.wav','timeline.json','exports/subtitles.srt']:
+   with self.subTest(name=name):
+    write(self.root/'build/render_manifest.json',{'project_sha256':fingerprint(p),'video_sha256':digest(v),'inputs':render_inputs(self.root,p)})
+    write(self.root/'exports/verification.json',{'video_sha256':digest(v),'automated_media_checks':'passed','visual_review':'passed','audio_listening_review':'passed'})
+    f=self.root/name;original=f.read_bytes();f.write_bytes(original+b' ')
+    with self.assertRaisesRegex(ValueError,'Stale render'):mark_review(self.root,'Inspected the final video and listened to all narration.')
+    with self.assertRaisesRegex(ValueError,'Stale render'):package(self.root)
+    f.write_bytes(original)
  def test_visual_only_revision_reuses_audio_and_all_times(self):
   import numpy as np,soundfile as sf
   from proof_video.audio import build

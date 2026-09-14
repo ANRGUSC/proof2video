@@ -7,11 +7,29 @@ self-contained skill directory, including its executable media helpers,
 references, and worked example. It does not overwrite an existing skill.
 Start a new Codex session and invoke `$proof-to-video`.
 
+The default destination is the legacy `~/.codex/skills` location (or
+`$CODEX_HOME/skills`). Current [OpenAI documentation](https://learn.chatgpt.com/docs/build-skills)
+also documents `~/.agents/skills` for user skills. Select that explicitly with
+`--skills-dir ~/.agents/skills` (PowerShell: `--skills-dir "$HOME/.agents/skills"`)
+when appropriate for your client. The isolated installer test establishes that
+the copied CLI works; it does not establish discovery in every client version.
+
 The copied skill requires a Python environment and media dependencies as
 described in the README. The installer does not install dependencies, download
 model weights, or copy credentials.
 
-## Plugin-capable clients
+## Claude Code: local plugin directory
+
+Run `claude --plugin-dir ./plugins/proof-to-video` from the repository checkout,
+then invoke `/proof-to-video:proof-to-video`. Use an absolute path when launching
+from another directory. This is a session-local load; supply the flag each time.
+No marketplace registration is needed. The Claude manifest lives at
+`plugins/proof-to-video/.claude-plugin/plugin.json` and uses the existing
+`skills/proof-to-video/` directory and Python helpers. Install the same media
+dependencies described in the README. The Codex standalone installer does not
+install into Claude Code.
+
+## Other plugin-capable clients
 
 The plugin directory is `plugins/proof-to-video`. It includes both a portable
 root `plugin.json` and the Codex compatibility manifest at

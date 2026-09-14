@@ -5,16 +5,10 @@ end-to-end example. Inspect the actual exported video and record what was tested
 Use `python scripts/package_release.py --output /path/to/release` to produce source and installable-plugin
 archives from tracked Git files. Commit all intended source changes first.
 
-For a new GitHub repository, an authenticated owner can run from this checkout:
-
-```bash
-gh repo create ANRGUSC/proof2video --public --source=. --remote=origin --push
-```
-
-Alternatively, create an empty public repository in the GitHub interface, add its
-URL as `origin`, and push `main`. These are publishing actions; run them only
-when the repository owner has authorized that publication. Never put tokens in
-source or command text.
+The public repository already exists at https://github.com/ANRGUSC/proof2video.
+Review and merge intended changes there, wait for CI on the release commit, and
+package from a clean checkout. Publishing commits, tags, or assets requires the
+repository owner's authorization. Never put tokens in source or command text.
 
 After source publication and review, tag `v0.1.0` and attach release archives and
 the reviewed example video ZIP to the release. Do not include model weights,

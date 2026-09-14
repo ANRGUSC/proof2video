@@ -92,6 +92,13 @@ burned captions. `render --preview` produces a separate 720p preview; run
 `verify --preview` to check it. Render and verify full quality before packaging.
 The pipeline also writes SRT, VTT, transcript, chapters, verification JSON,
 per-cue frames/contact sheets, a video-only ZIP, and a project-source ZIP.
+Final snapshots are under `qa/final/`; preview snapshots are under `qa/preview/`.
+Preview manifests, timing audits, and verification reports are separate from
+the final video's records. Verification, review, and packaging reject changes
+to bound proof, timeline, narration, custom visual code, assets, simulation
+outputs, and subtitle/transcript files. Rerender and verify after such changes.
+Keep custom visual dependencies inside the project asset directories; arbitrary
+external files or imported modules are not covered by these input hashes.
 
 Captions are burned into the video as well as exported for platform upload.
 Viewers enabling platform captions may see two caption rows. If the user prefers
